@@ -60,7 +60,7 @@ library("dplyr")
 library("hdf5r")
 library("ClusterR")
 source('spatial_data_estimate.R')
-hc1= Read10X_h5('/home/cuiyaxuan/spatialLIBD/151672/151672_filtered_feature_bc_matrix.h5')  #### to your path and file name
+hc1= Read10X_h5('/home/cuiyaxuan/spatialLIBD/Dataset_151672/151672_filtered_feature_bc_matrix.h5')  #### to your path and file name
 estimate_spatial(hc1=hc1)
            ''')
 
@@ -82,7 +82,7 @@ from sklearn import metrics
 import multiprocessing as mp
 import dropout
 
-file = '/home/cuiyaxuan/spatialLIBD/151672' # Input the data path for the nonlinear model.
+file = '/home/cuiyaxuan/spatialLIBD/Dataset_151672' # Input the data path for the nonlinear model.
 count='151672_filtered_feature_bc_matrix.h5' # Input the file name for the nonlinear model.
 adata = sc.read_visium(file, count_file=count, load_images=True)
 
@@ -96,9 +96,9 @@ n_clusters = 5  # Users can input either the default number of clusters or the e
 
 import rpy2.robjects as robjects
 
-data_path = '/home/cuiyaxuan/spatialLIBD/151672/151672_filtered_feature_bc_matrix.h5' # Input the data path and file name for the nonlinear model.
-position_path = '/home/cuiyaxuan/spatialLIBD/151672/spatial/tissue_positions_list.csv' # Input the data path and position file name for the nonlinear model.
-ARI_compare='/home/cuiyaxuan/spatialLIBD/151672/cluster_labels_151672.csv' #  Input the ground truth data path and file name for comparing with the clustering results
+data_path = '/home/cuiyaxuan/spatialLIBD/Dataset_151672/151672_filtered_feature_bc_matrix.h5' # Input the data path and file name for the nonlinear model.
+position_path = '/home/cuiyaxuan/spatialLIBD/Dataset_151672/spatial/tissue_positions_list.csv' # Input the data path and position file name for the nonlinear model.
+ARI_compare='/home/cuiyaxuan/spatialLIBD/Dataset_151672/cluster_labels_151672.csv' #  Input the ground truth data path and file name for comparing with the clustering results
 
 robjects.globalenv['data_path'] = robjects.vectors.StrVector([data_path])
 robjects.globalenv['position_path'] = robjects.vectors.StrVector([position_path])
@@ -204,7 +204,7 @@ import dropout
 mpl.rcParams['pdf.fonttype'] = 42
 mpl.rcParams["font.sans-serif"] = "Arial"
 warnings.filterwarnings('ignore')
-file_fold = '/home/cuiyaxuan/spatialLIBD/151672/' # your path
+file_fold = '/home/cuiyaxuan/spatialLIBD/Dataset_151672/' # your path
 adata = sc.read_visium(file_fold, count_file='151672_filtered_feature_bc_matrix.h5', load_images=True)  #### project name
 drop=dropout.dropout(adata)
 dropout.dropout(adata)
@@ -265,7 +265,7 @@ device = torch.device('cuda:1' if torch.cuda.is_available() else 'cpu')
 
 for i in [4000, 4500, 5000]:
    n_clusters = 5  ###### the number of spatial domains.
-   file_fold = '/home/cuiyaxuan/spatialLIBD/151672' #### to your path
+   file_fold = '/home/cuiyaxuan/spatialLIBD/Dataset_151672' #### to your path
    adata = sc.read_visium(file_fold, count_file='151672_filtered_feature_bc_matrix.h5', load_images=True) #### project name
    adata.var_names_make_unique()
    model = scSTADE(adata,device=device,n_top_genes=i)
@@ -333,7 +333,7 @@ library(parallel)
 library(doParallel)
 
 source('Cri4.R')
-hc1= Read10X_h5('/home/cuiyaxuan/spatialLIBD/151672/151672_filtered_feature_bc_matrix.h5') #### to your path and project name
+hc1= Read10X_h5('/home/cuiyaxuan/spatialLIBD/Dataset_151672/151672_filtered_feature_bc_matrix.h5') #### to your path and project name
 feature<-select_feature(hc1,4000,500)
 detectCores()
 cl <- makeCluster(3) # call 3 cpu cores
@@ -341,7 +341,7 @@ k=5 # k represent the number of spatial domains.
 parLapply(cl,1:3,feature=feature,k=k,pearson_metric) 
 stopCluster(cl)
 
-tissue_local=read.csv("/home/cuiyaxuan/spatialLIBD/151672/spatial/tissue_positions_list.csv",row.names = 1,header = FALSE)
+tissue_local=read.csv("/home/cuiyaxuan/spatialLIBD/Dataset_151672/spatial/tissue_positions_list.csv",row.names = 1,header = FALSE)
 adj_matrix=construct_adj_matrix(feature[[1]],tissue_local)
 write.table(adj_matrix,file="adj_matrix.txt",sep=" ",quote=TRUE)
 detectCores()
@@ -372,7 +372,7 @@ import visual
 mpl.rcParams['pdf.fonttype'] = 42
 mpl.rcParams["font.sans-serif"] = "Arial"
 warnings.filterwarnings('ignore')
-file_fold = '/home/cuiyaxuan/spatialLIBD/151672/' # your path
+file_fold = '/home/cuiyaxuan/spatialLIBD/Dataset_151672/' # your path
 adata = sc.read_visium(file_fold, count_file='151672_filtered_feature_bc_matrix.h5', load_images=True)
 df_label=pd.read_csv('./label.csv', index_col=0) 
 visual.visual(adata,df_label)
