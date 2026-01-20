@@ -1,13 +1,13 @@
 # scSTADE : An Integrated Deep Learning Framework for Denoising and Analyzing Single-Cell Spatial Transcriptomics
-![image](https://github.com/cuiyaxuan/DenoiseST/blob/master/Image/%E5%B9%BB%E7%81%AF%E7%89%871.png)
-## Tip: To facilitate researchers' usage, examples of our project can be run in the full folder's IPython notebooks (after configuring the environment dependencies as described in the README). We will soon optimize the README page for better usability. Additionally, we are developing a web tutorial for DenoiseST, which will be released soon. We apologize for any inconvenience this may cause. <br>
+![image](https://github.com/cuiyaxuan/scSTADE/blob/master/Image/%E5%B9%BB%E7%81%AF%E7%89%871.png)
+## Tip: To facilitate researchers' usage, examples of our project can be run in the full folder's IPython notebooks (after configuring the environment dependencies as described in the README). We will soon optimize the README page for better usability. Additionally, we are developing a web tutorial for scSTADE, which will be released soon. We apologize for any inconvenience this may cause. <br>
 
 
 ##### Due to the protocol issues of various space technology platforms, the data format is very different, and various platforms do not provide morphological images. For the convenience of users, we have changed the way of reading data to make it easier to use.<br>
 
-##### DenoiseST is used on spatial transcriptomics (ST) datasets. In essence, you can refer to the following examples: <br>
+##### scSTADE is used on spatial transcriptomics (ST) datasets. In essence, you can refer to the following examples: <br>
 
-##### * _DenoiseST on DLPFC from 10x Visium._ <br>
+##### * _scSTADE on DLPFC from 10x Visium._ <br>
 ##### Using python virtual environment with conda. Please create a Pytorch environment, install Pytorch and some other packages, such as "numpy","pandas", "scikit-learn" and "scanpy". See the requirements.txt file for an overview of the packages in the environment we used to produce our results. Alternatively, you can install the environment dependencies in the following sequence to minimize environment conflicts. <br>
 
 ```R
@@ -48,7 +48,7 @@ install.packages('mclust')
 ```
 
 #### Estimated number of spatial transcriptome data clusters. We utilized the ClusterR package in the R language for estimation; however, it can also be executed in a Python environment with the prerequisite installation of specific R packages
-##### First, cd /home/.../DenoiseST-main/Full <br>
+##### First, cd /home/.../scSTADE-main/Full <br>
 
 ```R
 
@@ -66,14 +66,14 @@ estimate_spatial(hc1=hc1)
 
 ```
 ##### We choose the cluster number where the first occurrence of the numerical value of f(k) reaches 1. It will automatically generate a picture depicting the estimated number of clusters in the current directory.<br>
-![image](https://github.com/cuiyaxuan/DenoiseST/blob/master/Image/est.png)
+![image](https://github.com/cuiyaxuan/scSTADE/blob/master/Image/est.png)
 
  
-##### First, cd /home/.../DenoiseST-main/Full <br>
+##### First, cd /home/.../scSTADE-main/Full <br>
 ##### For Visium data, the model can be adaptively adjusted based on data quality using the following command. <br>
 ##### You can modify the dataset path in the Denoise_run1.py file and run it directly. <br>
 ```python
-from DenoiseST import DenoiseST
+from scSTADE import scSTADE
 import os
 import torch
 import pandas as pd
@@ -113,7 +113,7 @@ if dropout_rate>0.85:
       file_fold = file
       adata = sc.read_visium(file_fold, count_file = count, load_images=True)
       adata.var_names_make_unique()
-      model = DenoiseST(adata,device=device,n_top_genes=i)
+      model = scSTADE(adata,device=device,n_top_genes=i)
       adata = model.train()
       radius = 50
       tool = 'mclust' # mclust, leiden, and louvain
@@ -173,7 +173,7 @@ else:
    file_fold = file
    adata = sc.read_visium(file_fold, count_file= count, load_images=True)
    adata.var_names_make_unique()
-   model = DenoiseST(adata,device=device,n_top_genes=5000)
+   model = scSTADE(adata,device=device,n_top_genes=5000)
    adata = model.train()
    radius = 50
    tool = 'mclust' # mclust, leiden, and louvain
@@ -212,8 +212,8 @@ print(drop)
 ```
 
 
-##### Full Version. We execute the nonlinear denoising model in the python environment and can refer to the document DenoiseST_DP_run.py.  <br>
-##### First, cd /home/.../DenoiseST-main/Full <br>
+##### Full Version. We execute the nonlinear denoising model in the python environment and can refer to the document scSTADE_DP_run.py.  <br>
+##### First, cd /home/.../scSTADE-main/Full <br>
 ```R
 conda create -n NL
 source activate NL
@@ -233,7 +233,7 @@ pip install tqdm==4.64.0
 
 
 ```python
-from DenoiseST import DenoiseST
+from scSTADE import scSTADE
 import os
 import torch
 import pandas as pd
@@ -268,7 +268,7 @@ for i in [4000, 4500, 5000]:
    file_fold = '/home/cuiyaxuan/spatialLIBD/151672' #### to your path
    adata = sc.read_visium(file_fold, count_file='151672_filtered_feature_bc_matrix.h5', load_images=True) #### project name
    adata.var_names_make_unique()
-   model = DenoiseST(adata,device=device,n_top_genes=i)
+   model = scSTADE(adata,device=device,n_top_genes=i)
    adata = model.train()
    radius = 50
    tool = 'mclust' # mclust, leiden, and louvain
@@ -283,7 +283,7 @@ for i in [4000, 4500, 5000]:
    adata.obs['domain'].to_csv(f"label_{i}.csv")
 
 ```
-##### We execute the linearing model in the R environment and can refer to the document DenoiseST_TR_run.py. We need to install the R language (version R>4.0) in the system's default environment, and if you're using it for the first time, you'll need to install some R packages.
+##### We execute the linearing model in the R environment and can refer to the document scSTADE_TR_run.py. We need to install the R language (version R>4.0) in the system's default environment, and if you're using it for the first time, you'll need to install some R packages.
 
 ```R
 conda create -n NT
@@ -378,7 +378,7 @@ df_label=pd.read_csv('./label.csv', index_col=0)
 visual.visual(adata,df_label)
 
 ```
-![image](https://github.com/cuiyaxuan/DenoiseST/blob/master/Image/151672.png)
+![image](https://github.com/cuiyaxuan/scSTADE/blob/master/Image/151672.png)
 
 
 
@@ -390,7 +390,7 @@ visual.visual(adata,df_label)
 ## Simplified version <br>
 
 ```python
-from DenoiseST import DenoiseST
+from scSTADE import scSTADE
 import os
 import torch
 import pandas as pd
@@ -422,7 +422,7 @@ n_clusters = 20  ###### the number of spatial domains.
 file_fold = '/home/cuiyaxuan/spatialLIBD/3.Human_Breast_Cancer' #### to your path
 adata = sc.read_visium(file_fold, count_file='filtered_feature_bc_matrix.h5', load_images=True) #### project name
 adata.var_names_make_unique()
-model = DenoiseST(adata,device=device,n_top_genes=5000)
+model = scSTADE(adata,device=device,n_top_genes=5000)
 adata = model.train()
 radius = 50
 tool = 'mclust' # mclust, leiden, and louvain
@@ -437,13 +437,13 @@ adata.obs['domain']
 adata.obs['domain'].to_csv("label.csv")
 
 ```
-![image](https://github.com/cuiyaxuan/DenoiseST/blob/master/Image/breast.png)
+![image](https://github.com/cuiyaxuan/scSTADE/blob/master/Image/breast.png)
 
 
 ## High resolution data <br>
 
 ```python
-from DenoiseST import DenoiseST
+from scSTADE import scSTADE
 import os
 import torch
 import pandas as pd
@@ -475,7 +475,7 @@ n_clusters = 10  ###### the number of spatial domains.
 file_path = '/home/cuiyaxuan/spatialLIBD/6.Mouse_Hippocampus_Tissue/' #please replace 'file_path' with the download path
 adata = sc.read_h5ad(file_path + 'filtered_feature_bc_matrix_200115_08.h5ad') #### project name
 adata.var_names_make_unique()
-model = DenoiseST(adata,datatype='Slide',device=device,n_top_genes=4000)
+model = scSTADE(adata,datatype='Slide',device=device,n_top_genes=4000)
 adata = model.train()
 radius = 50
 tool = 'mclust' # mclust, leiden, and louvain
@@ -490,13 +490,13 @@ adata.obs['domain']
 adata.obs['domain'].to_csv("label.csv")
 
 ```
-![image](https://github.com/cuiyaxuan/DenoiseST/blob/master/Image/hip.png)
+![image](https://github.com/cuiyaxuan/scSTADE/blob/master/Image/hip.png)
 
 
 ## High resolution Visium HD data <br>
 
 ```python
-from DenoiseST_HD import DenoiseST
+from scSTADE_HD import scSTADE
 import os
 import torch
 import pandas as pd
@@ -530,7 +530,7 @@ n_clusters = 30  ###### the number of spatial domains.
 file_fold = '/home/cuiyaxuan/spatialLIBD/square_016um/' #### to your path
 adata = sc.read_visium(file_fold, count_file='filtered_feature_bc_matrix.h5', load_images=True) #### project name
 adata.var_names_make_unique()
-model = DenoiseST(adata,device=device,n_top_genes=5000)
+model = scSTADE(adata,device=device,n_top_genes=5000)
 adata = model.train()
 radius = 50
 tool = 'mclust' # mclust, leiden, and louvain
@@ -545,14 +545,14 @@ adata.obs['domain']
 adata.obs['domain'].to_csv("label.csv")
 
 ```
-![image](https://github.com/cuiyaxuan/DenoiseST/blob/master/Image/human_colon_cancer_domain20-1.png)
+![image](https://github.com/cuiyaxuan/scSTADE/blob/master/Image/human_colon_cancer_domain20-1.png)
 
 
 
 # FVG:identifying functionally variable genes
 
 ##### Then, we execute the FVG model in the R environment <br>
-##### First, cd /home/.../DenoiseST-main/Full <br>
+##### First, cd /home/.../scSTADE-main/Full <br>
 
 ```R
 conda create -n r4
