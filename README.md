@@ -46,7 +46,6 @@ import rpy2.robjects as robjects
 robjects.r('''
 install.packages('foreach')
 install.packages('doParallel')
-install.packages('mclust')
            ''')
 ```
 
