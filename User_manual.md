@@ -1,6 +1,6 @@
 # scSTADE : An Integrated Deep Learning Framework for Denoising and Analyzing Single-Cell Spatial Transcriptomics
 ![image](https://github.com/cuiyaxuan/scSTADE/blob/master/Image/%E5%B9%BB%E7%81%AF%E7%89%871.png)
-## Tip: To facilitate researchers' usage, examples of our project can be run in the full folder's IPython notebooks (after configuring the environment dependencies as described in the README). We will soon optimize the README page for better usability. Additionally, we are developing a web tutorial for scSTADE, which will be released soon. We apologize for any inconvenience this may cause. <br>
+## Tip: To facilitate researchers' usage, examples of our project can be run in the Demo_Examples folder's IPython notebooks (after configuring the environment dependencies as described in the README). We will soon optimize the README page for better usability. Additionally, we are developing a web tutorial for scSTADE, which will be released soon. We apologize for any inconvenience this may cause. <br>
 
 
 ##### Due to the protocol issues of various space technology platforms, the data format is very different, and various platforms do not provide morphological images. For the convenience of users, we have changed the way of reading data to make it easier to use.<br>
@@ -48,7 +48,7 @@ install.packages('mclust')
 ```
 
 #### Estimated number of spatial transcriptome data clusters. We utilized the ClusterR package in the R language for estimation; however, it can also be executed in a Python environment with the prerequisite installation of specific R packages
-##### First, cd /home/.../scSTADE-main/Full <br>
+##### First, cd /home/.../scSTADE-main/scSTADE_Cluster_Functions <br>
 
 ```R
 
@@ -69,7 +69,7 @@ estimate_spatial(hc1=hc1)
 ![image](https://github.com/cuiyaxuan/scSTADE/blob/master/Image/est.png)
 
  
-##### First, cd /home/.../scSTADE-main/Full <br>
+##### First, cd /home/.../scSTADE-main/scSTADE_Cluster_Functions <br>
 ##### For Visium data, the model can be adaptively adjusted based on data quality using the following command. <br>
 ##### You can modify the dataset path in the Denoise_run1.py file and run it directly. <br>
 ```python
@@ -213,7 +213,7 @@ print(drop)
 
 
 ##### Full Version. We execute the nonlinear denoising model in the python environment and can refer to the document scSTADE_DP_run.py.  <br>
-##### First, cd /home/.../scSTADE-main/Full <br>
+##### First, cd /home/.../scSTADE-main/scSTADE_Cluster_Functions <br>
 ```R
 conda create -n NL
 source activate NL
@@ -552,7 +552,7 @@ adata.obs['domain'].to_csv("label.csv")
 # FVG:identifying functionally variable genes
 
 ##### Then, we execute the FVG model in the R environment <br>
-##### First, cd /home/.../scSTADE-main/Full <br>
+##### First, cd /home/.../scSTADE-main/scSTADE_Cluster_Functions <br>
 
 ```R
 conda create -n r4
