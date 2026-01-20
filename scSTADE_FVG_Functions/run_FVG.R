@@ -11,8 +11,8 @@ source('distribution.R')
 
 hc1= Read10X_h5('/home/cuiyaxuan/spatialLIBD/151673/151673_filtered_feature_bc_matrix.h5') #### to your path and project name
 label=read.csv("/home/cuiyaxuan/metric_change/revise_R2/est_151673/conlabel.csv",header = T,row.names = 1) #### to your path of cluster label
-n=1 ##### Marker genes identified for a specific cluster. 
-dis<-distri(hc1,label,n)
+n=1 ##### Marker genes identified for a specific cluster. Marker genes representative of cluster 1
+dis<-distri(hc1,label,n) ##### Marker genes are extracted only for the specified cell type (or category)
 
 #You can obtain marker genes for all clusters using the following command. Additionally, you can obtain the most significant genes with the following command.
 
@@ -75,3 +75,4 @@ fvg=cbind(df1,crinum)
 fvg_sort <- fvg[order(-fvg$crinum), ]
 
 write.csv(fvg_sort ,"fvg.csv")
+
