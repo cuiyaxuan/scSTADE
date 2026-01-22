@@ -552,7 +552,7 @@ adata.obs['domain'].to_csv("label.csv")
 # FVG:identifying functionally variable genes
 
 ##### Then, we execute the FVG model in the R environment <br>
-##### First, cd /home/.../scSTADE-main/scSTADE_Cluster_Functions <br>
+##### First, cd /home/.../scSTADE-main/scSTADE_FVG_Functions <br>
 
 ```R
 conda create -n r4
@@ -584,86 +584,189 @@ install.packages('tidyverse')
 ##### DEGs in spatial transcriptomics <br>
 ```R
 
+# You can run "Rscript step1_run_DEG.R" 
+# =========================
+# 1. Load libraries
+# =========================
+source("functions_DEG.R")
 library(DEGman)
-library("Seurat")
-library("dplyr")
-library("hdf5r")
+library(Seurat)
+library(dplyr)
+library(hdf5r)
 library(philentropy)
 library(foreach)
 library(doParallel)
-source('distribution.R')
+library(doSNOW)
 
-hc1= Read10X_h5('/home/cuiyaxuan/spatialLIBD/151673/151673_filtered_feature_bc_matrix.h5') #### to your path and project name
-label=read.csv("/home/cuiyaxuan/metric_change/revise_R2/est_151673/conlabel.csv",header = T,row.names = 1) #### to your path of cluster label
-n=1 ##### Marker genes identified for a specific cluster. 
-dis<-distri(hc1,label,n)
 
+
+# =========================
+# 3. Load data
+# =========================
+hc1 <- Read10X_h5(
+  "/home/cuiyaxuan/spatialLIBD/151673/151673_filtered_feature_bc_matrix.h5" #### to your path and project name
+)
+
+label <- read.csv(
+  "/home/cuiyaxuan/metric_change/revise_R2/est_151673/conlabel.csv", #### to your path of cluster label
+  header = TRUE,
+  row.names = 1
+)
+
+# =========================
+# 4. Preprocess (once)
+# =========================
+matlist <- prep_matlist(hc1, label)
+k <- length(matlist)    # number of clusters
+
+# =========================
+# 5. Parallel + progress bar
+# =========================
+ncore <- min(k, parallel::detectCores() - 1)
+cl <- makeCluster(ncore)
+registerDoSNOW(cl)
+
+pb <- txtProgressBar(min = 0, max = k, style = 3)
+progress <- function(n) setTxtProgressBar(pb, n)
+opts <- list(progress = progress)
+
+files <- foreach(
+  n = 1:k,
+  .packages = c("DEGman"),
+  .options.snow = opts
+) %dopar% {
+  run_one_cluster(matlist, n)
+}
+
+close(pb)
+stopCluster(cl)
+
+# =========================
+# 6. Done
+# =========================
 ```
 #####  DEGs data in a CSV file.You can obtain marker genes for all clusters using the following command. Additionally, you can obtain the most significant genes with the following command. <br>
 
 ##### FVGs in spatial transcriptomics <br>
 
 ```R
+# You can run "Rscript step2_run_FVG.R"
 
-files<-dir(path = "./",full.names = T,pattern = ".csv")
+source("functions_FVG.R")
+
 library(tidyverse)
-df<-map(files,read.csv)
-class(df)
-vec1=df[[1]]
-for (i in 2:length(df)) {
-  vec1=rbind(vec1,df[[i]])
-}
-fre=table(vec1$x)
 
-rounded_number=3 #You can choose the cluster by default, which is "cluster/2-1", or specify your own cluster using the following command.
-fre=names(table(vec1$x))[table(vec1$x)>=rounded_number]
-write.csv(fre,"df1.csv")
+rounded_number <- 3
 
-#################################Functionally variable genes weight compute################################
+fre <- list.files(
+  path = ".",
+  pattern = "\\.csv$",
+  full.names = TRUE
+) %>%
+  map_dfr(read.csv) %>%        # 自动 rbind
+  count(x) %>%                 # table(vec1$x)
+  filter(n >= rounded_number) %>%
+  pull(x)
 
-library("Seurat")
-library("dplyr")
-library("hdf5r")
-library(philentropy)
+write.csv(fre, "df1.csv", row.names = FALSE)
+
+
+# ==============================================================================
+# File: main.R
+# Description: Main execution script for FVG calculation
+# Usage: Make sure functions_FVG.R is in the same directory before running
+# ==============================================================================
+
+library(Seurat)
+library(dplyr)
+library(hdf5r)
 library(foreach)
+library(parallel)
 library(doParallel)
 
+# ==============================================================================
+# 1. Set paths and load data
+# ==============================================================================
+h5_path <- "/home/cuiyaxuan/spatialLIBD/151673/151673_filtered_feature_bc_matrix.h5"  #### to your path and project name
+spatial_path <- "/home/cuiyaxuan/spatialLIBD/151673/spatial/tissue_positions_list.csv"  #### to your path and project name
+gene_list_path <- "df1.csv"
 
+cat("Loading data...\n")
+hc1 <- Read10X_h5(h5_path)
+tissue_local <- read.csv(spatial_path, row.names = 1, header = FALSE)
 
-source('test_finally.R')
-hc1= Read10X_h5('/home/cuiyaxuan/spatialLIBD/151673/151673_filtered_feature_bc_matrix.h5') #### to your path and project name
-tissue_local=read.csv("/home/cuiyaxuan/spatialLIBD/151673/spatial/tissue_positions_list.csv",row.names = 1,header = FALSE) #### to your path and project name
-print(dim(tissue_local))
-pbmc=CreateSeuratObject(counts = hc1, project = "HC_1", min.cells = 10)
-pbmc=NormalizeData(pbmc, normalization.method = "LogNormalize", scale.factor = 10000)
+# ==============================================================================
+# 2. Seurat preprocessing
+# ==============================================================================
+pbmc <- CreateSeuratObject(counts = hc1, project = "HC_1", min.cells = 10)
+pbmc <- NormalizeData(pbmc, normalization.method = "LogNormalize", scale.factor = 10000)
 pbmc <- FindVariableFeatures(pbmc, selection.method = "vst", nfeatures = 30000)
-all.genes <- rownames(pbmc)
-mat<-as.matrix(pbmc[["RNA"]]@data)
-a <- VariableFeatures(pbmc)
-mat=mat[rownames(mat) %in% a,]
-mat=t(mat)
-aa <- rownames(mat)
-tissue_local=tissue_local[rownames(tissue_local) %in% aa,]
 
-DF1 <- mutate(tissue_local, id = rownames(tissue_local))
-mat=as.data.frame(mat)
-DF2 <- mutate(mat, id = rownames(mat))
-dat=merge(DF1,DF2,by="id")
-x_y_list=dat[,3:4]
-dat=t(dat)
-df1=read.csv("df1.csv",row.names = 1,header = T)
+# ==============================================================================
+# 3. Data alignment
+# ==============================================================================
+common_cells <- intersect(colnames(pbmc), rownames(tissue_local))
+cat(sprintf("Common cells found: %d\n", length(common_cells)))
 
-dat1=dat[rownames(dat) %in% df1[,1],]
-dat1=t(dat1)
-n_cores=24
-cls <- makeCluster(n_cores) ## call 24 cpu cores
+pbmc <- subset(pbmc, cells = common_cells)
+tissue_local <- tissue_local[common_cells, ]
+
+# Load target gene list
+df1 <- read.csv(gene_list_path, header = TRUE)
+target_genes <- df1[, 1]
+
+# Keep genes present in expression matrix
+valid_genes <- intersect(target_genes, rownames(pbmc))
+
+# Extract expression matrix (cells × genes)
+mat_sparse <- GetAssayData(pbmc, layer = "data")[valid_genes, ]
+dat1 <- as.matrix(t(mat_sparse))
+
+# Extract spatial coordinates (first two columns)
+x_y_list <- tissue_local[, 1:2]
+
+if (!all(rownames(dat1) == rownames(x_y_list))) {
+  stop("Data alignment error!")
+}
+
+# ==============================================================================
+# 4. Parallel computation
+# ==============================================================================
+n_cores <- 24
+cat(sprintf("Starting parallel processing with %d cores...\n", n_cores))
+
+cls <- makeCluster(n_cores)
 registerDoParallel(cls)
-crinum=foreach(q=1:dim(dat1)[2],.combine='rbind') %dopar% cripar(q,dat1,x_y_list,Ccri=50,highval=500,lowval=50)
-stopCluster(cls)
-fvg=cbind(df1,crinum)
-fvg_sort <- fvg[order(-fvg$crinum), ]
 
-write.csv(fvg_sort ,"fvg.csv")
+# Export required objects to worker nodes
+clusterExport(cls, c("cripar_opt", "getmode", "x_y_list"))
+
+crinum <- foreach(
+  gene_vec = iter(dat1, by = "col"),
+  .combine = "c",
+  .packages = "stats"
+) %dopar% {
+  cripar_opt(gene_vec, x_y_list, Ccri = 10, highval = 500, lowval = 50)
+}
+
+stopCluster(cls)
+
+# ==============================================================================
+# 5. Save results
+# ==============================================================================
+result_df <- data.frame(gene = valid_genes, crinum = crinum)
+
+# Merge with original gene list (keep original order)
+final_res <- merge(df1, result_df,
+                   by.x = names(df1)[1],
+                   by.y = "gene",
+                   all.x = TRUE)
+
+fvg_sort <- final_res[order(-final_res$crinum), ]
+write.csv(fvg_sort, "fvg.csv", row.names = FALSE)
+
+cat("Done! Results saved to 'fvg.csv'.\n")
+
 
 ```
 ##### DEGs data in a fvg.csv file <br>
