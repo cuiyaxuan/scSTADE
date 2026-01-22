@@ -73,21 +73,8 @@ cripar_opt <- function(gene_vec, x_y_list, Ccri=50, highval=500, lowval=50){
 }
 
 
-library(tidyverse)
 
-rounded_number <- 3
 
-fre <- list.files(
-  path = ".",
-  pattern = "\\.csv$",
-  full.names = TRUE
-) %>%
-  map_dfr(read.csv) %>%        # 自动 rbind
-  count(x) %>%                 # table(vec1$x)
-  filter(n >= rounded_number) %>%
-  pull(x)
-
-write.csv(fre, "df1.csv", row.names = FALSE)
 
 
 
