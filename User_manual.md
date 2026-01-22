@@ -746,7 +746,7 @@ crinum <- foreach(
   .combine = "c",
   .packages = "stats"
 ) %dopar% {
-  cripar_opt(gene_vec, x_y_list, Ccri = 10, highval = 500, lowval = 50)
+  cripar_opt(gene_vec, x_y_list, Ccri = 10, highval = 500, lowval = 50) # Users can freely adjust the following three parameters: Ccri = 10, highval = 500, and lowval = 50.
 }
 
 stopCluster(cls)
