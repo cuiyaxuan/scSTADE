@@ -562,12 +562,13 @@ conda search r-base
 conda install r-base=4.2.0
 conda install conda-forge::r-seurat==4.4.0
 conda install conda-forge::r-hdf5r
+onda install r-devtools
 ```
 
 ##### Using R virtual environment with conda <br>
 ```R
 
-install.packages("devtools")
+library("devtools")
 devtools::install_github("shaoqiangzhang/DEGman")
 
 install.packages("hdf5r")
