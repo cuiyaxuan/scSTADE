@@ -4,7 +4,21 @@
 
 
 source("functions_FVG.R")
+library(tidyverse)
 
+rounded_number <- 3
+
+fre <- list.files(
+  path = ".",
+  pattern = "\\.csv$",
+  full.names = TRUE
+) %>%
+  map_dfr(read.csv) %>%        # 自动 rbind
+  count(x) %>%                 # table(vec1$x)
+  filter(n >= rounded_number) %>%
+  pull(x)
+
+write.csv(fre, "df1.csv", row.names = FALSE)
 # ==============================================================================
 # File: main.R
 # Description: 主执行脚本，包含数据IO和并行控制
@@ -102,5 +116,6 @@ fvg_sort <- final_res[order(-final_res$crinum), ]
 write.csv(fvg_sort, "fvg.csv", row.names = FALSE)
 
 cat("Done! Results saved to 'fvg.csv'.\n")
+
 
 
