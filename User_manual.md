@@ -1,4 +1,4 @@
-# scSTADE : An Integrated Deep Learning Framework for Denoising and Analyzing Single-Cell Spatial Transcriptomics
+# scSTADE : An Integrated and Robust Deep Learning Framework for Denoising and Analyzing Single-Cell Spatial Transcriptomics
 ![image](https://github.com/cuiyaxuan/scSTADE/blob/master/Image/%E5%B9%BB%E7%81%AF%E7%89%871.png)
 ## Tip: To facilitate use by researchers, example code for our project is provided as IPython Notebooks in the demo example folder. Users can download the code files and directly run the clustering by modifying the data paths in scSTADE_run1.py under scSTADE_Cluster_Functions. To identify FVGs, users should modify the data paths in step1_run_DEG.R and step2_run_FVG.R under scSTADE_FVG_Functions. A detailed, step-by-step workflow covering the entire process is provided in User_manual.md (after configuring the environment dependencies as described in the README). We will soon optimize the README page for better usability <br>
 
