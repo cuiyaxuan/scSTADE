@@ -143,7 +143,7 @@ if dropout_rate>0.85:
    print(ARI_compare)
    print(n_clusters)
 
-   source('Cri4.R')
+   source('.../scSTADE-master/scSTADE_Cluster_Functions/Cri4.R') #### to your path
    hc1= Read10X_h5(data_path) #### to your path and project name
    feature<-select_feature(hc1,4000,500)
    detectCores()
@@ -332,7 +332,7 @@ library(foreach)
 library(parallel)
 library(doParallel)
 
-source('Cri4.R')
+source('.../scSTADE-master/scSTADE_Cluster_Functions/Cri4.R') #### to your path
 hc1= Read10X_h5('/home/cuiyaxuan/spatialLIBD/Dataset_151672/151672_filtered_feature_bc_matrix.h5') #### to your path and project name
 feature<-select_feature(hc1,4000,500)
 detectCores()
